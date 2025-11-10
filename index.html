@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Exam</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    #quiz-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9fafb;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .options button:hover {
+      background-color: #e5e7eb;
+    }
+
+    .options button.selected {
+      background-color: #60a5fa;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #3b82f6;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .controls button:hover {
+      background-color: #2563eb;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Online Exam</h1>
+  <div id="quiz-container">
+    <img id="question-image" src="" alt="Question" />
+    <div class="options" id="options"></div>
+    <div class="controls">
+      <button id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
+      <button id="submitBtn">Submit</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // ✅ Step 1: Define your correct answers here
+    const answerKeys = {
+      "q1.jpg": "A",
+      "q2.jpg": "C",
+      "q3.jpg": "D",
+      "q4.jpg": "B",
+      "q5.jpg": "A"
+    };
+
+    // ✅ Step 2: List all your image file names here (no need to rename alphabetically)
+    let imageFiles = Object.keys(answerKeys);
+
+    // ✅ Step 3: Sort filenames alphabetically
+    imageFiles.sort();
+
+    // Initialize quiz variables
+    let currentQuestion = 0;
+    let userAnswers = {};
+
+    const questionImage = document.getElementById("question-image");
+    const optionsDiv = document.getElementById("options");
+    const resultDiv = document.getElementById("result");
+
+    const optionLetters = ["A", "B", "C", "D"];
+
+    // Load question based on current index
+    function loadQuestion() {
+      const imageFile = imageFiles[currentQuestion];
+      questionImage.src = `images/${imageFile}`;
+      resultDiv.textContent = "";
+
+      // Create option buttons
+      optionsDiv.innerHTML = "";
+      optionLetters.forEach(letter => {
+        const btn = document.createElement("button");
+        btn.textContent = letter;
+        btn.onclick = () => selectOption(letter);
+        if (userAnswers[imageFile] === letter) {
+          btn.classList.add("selected");
+        }
+        optionsDiv.appendChild(btn);
+      });
+
+      // Hide/Show navigation buttons
+      document.getElementById("prevBtn").disabled = currentQuestion === 0;
+      document.getElementById("nextBtn").disabled = currentQuestion === imageFiles.length - 1;
+    }
+
+    // Handle option selection
+    function selectOption(letter) {
+      const imageFile = imageFiles[currentQuestion];
+      userAnswers[imageFile] = letter;
+      loadQuestion(); // refresh UI
+    }
+
+    // Navigation controls
+    document.getElementById("prevBtn").onclick = () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+      }
+    };
+
+    document.getElementById("nextBtn").onclick = () => {
+      if (currentQuestion < imageFiles.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      }
+    };
+
+    // Submit and calculate result
+    document.getElementById("submitBtn").onclick = () => {
+      let score = 0;
+      imageFiles.forEach(file => {
+        if (userAnswers[file] === answerKeys[file]) score++;
+      });
+      resultDiv.textContent = `Your Score: ${score} / ${imageFiles.length}`;
+    };
+
+    // Initialize quiz
+    loadQuestion();
+  </script>
+</body>
+</html>
